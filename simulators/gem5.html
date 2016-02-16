@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8"/>
+  <title>ARM-based Gem5 on Mac OSX</title>
+  <link rel="stylesheet" href="tufte.css"/>
+  <link rel="stylesheet" href="latex.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="text/x-mathjax-config">
+  	MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+  </script>
+  <script type="text/javascript" async
+     src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_CHTML">
+  </script>
+</head>
+
+<body>
+  <article>
+	<h1>ARM-based Gem5 on Mac OSX</h1>
+    <p class="subtitle">Qiong Cai (last updated on Feb 15, 2016)</p>
+	<p>This page contains everything I learned after playing with an ARM-based <a href="http://www.gem5.org/Main_Page">Gem5</a> simulator, running on Mac OSX (El Capitan and above). 
+	All experiments were done on my personal iMac (4 3.2GHz Skylake cores).
+	</p>
+
+	<h2>Basics</h2>
+	<p>I cloned the latest source codes from gem5 and put them in my <a href="https://github.com/qc76/simulators/tree/master/gem5/gem5">github directory</a>. A small change was added 
+	to <span class="code">SConstruct</span> so that the codes can be compiled on my machine.
+	<span class="marginnote">
+		Please check my git log to see the details.
+	</span>
+	</p>  
+
+	<p><span class="newthought">I am interested</span> in three versions of gem5: <span class="code">gem5.debug</span>, <span class="code">gem5.opt</span>,
+	<span class="code">gem5.fast</span>. The differences are document <a href="http://www.gem5.org/Build_System#Build_targets">here</a>. The following command is 
+	used to build <span class="code">gem5.opt</span> version and it took 18 minutes to finish the compilation on my computer.
+	<span class="marginnote">
+		<span class="code">$MYBUILD_DIR</span>
+		is anywhere but not the same as the gem5 source directory.
+	</span>
+	<pre class="code">
+		scons $MYBUILD_DIR/build/ARM/gem5.opt
+	</pre>
+	</p>
+
+	<p><span class="newthought">I used two</span> steps to run a given workload. The first step is to use the default configuration of detailed CPU timing model called 
+	<span class="code">detailed</span> or <span class="code">Deriv03CPU</span>. 
+	<pre class="code">
+		$MYBUILD_DIR/build/ARM/gem5.opt    
+			$SRC_DIR/configs/example/se.py  
+			--cpu-type=detailed --caches   
+			-c $SRC_DIR/tests/test-progs/\
+				hello/bin/arm/linux/hello
+	</pre>
+	</p>
+	<p>The first step generates a configure file called <span class="code">config.ini</span>, which contains many parameters. It's much easier to modify the text file 
+	directly. We can create a configure file for every experiment.
+	</p> 
+	<pre class="code">
+		$MYBUILD_DIR/build/ARM/gem5.opt 
+			$SRC_DIR/configs/example/read_config.py 
+			$SRC_DIR/experiments/\
+				hello-config-default.ini 
+	</pre>
+
+</body>
+</html>
