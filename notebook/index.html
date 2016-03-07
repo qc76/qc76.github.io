@@ -148,8 +148,9 @@ end;
 scrolling :=1;
 prologues :=3;
 outputformat := "svg";
-% default font in " " is Palatino
+% default font is 12pt Palatino
 defaultfont := "pplr8r";
+defaultscale := 12pt/fontsize defaultfont;
 
 verbatimtex
 %&latex
@@ -174,9 +175,9 @@ m=1.5cm;
 drawarrow (0,0)..(0,u);
 drawarrow (0,0)..(u,0);
 
-label.top(btex \begin{tabular}{c}\textbf{InfiniBand Bandwidth for} \\
-			textbf{x16 links (Gb/s)} \end{tabular} etex, (0,u));
-label.bot(btex \textbf{Latency (us)} etex, (u/2,-sep));
+label.top(btex \begin{tabular}{c}\textbf{\large InfiniBand Bandwidth for} \\
+			textbf{\large x16 links (Gb/s)} \end{tabular} etex, (0,u));
+label.bot(btex \textbf{\large Latency (us)} etex, (u/2,-sep));
 
 for i=1 step 1 until 6:
 	draw (v*i/6,0)--(v*i/6,tip);
@@ -250,6 +251,89 @@ endfig;
 end;
    </pre>
 
+  <p><label for="minimal-line" class="margin-toggle"></label><input type="checkbox" id="minimal-line" class="margin-toggle"/><span class="marginnote">
+	  <img src="img/tufte-mini-line.1.svg" alt="Minimal Line in Tufte Style"/><br>Minimal line plot in Tufte style.</span>
+      <span class="code">MetaPost</span> can generate figures in Tufte style.
+   </p>
+   <pre class="code">
+scrolling :=1;
+prologues :=3;
+outputformat := "svg";
+% default font is 14pt Palatino
+defaultfont := "pplr8r";
+defaultscale := 14pt/fontsize defaultfont;
+
+verbatimtex
+%&latex
+\documentclass{article}
+\usepackage[sc]{mathpazo} 
+\usepackage[scaled]{helvet}
+\usepackage{eulervm}
+\begin{document}
+etex
+
+beginfig(1);
+numeric xlen, ylen, tip, extra;
+xlen = 20cm;
+ylen=10cm;
+tip = 3pt;
+extra = 20pt;
+
+% draw x-axis labels
+for i =1967 step 1 until 1977:
+	draw (xlen*(i-1966)/11, -tip)--(xlen*(i-1966)/11, tip);
+    label.bot(decimal(i), (xlen*(i-1966)/11,-tip*2));
+endfor
+
+% draw y-axis labels
+for i=300 step 20 until 400:
+	numeric tt;
+	tt := ylen * (((i-300)/20 + 1)/6);
+	draw (-tip, tt)--(tip, tt);
+
+	string ss;
+	ss = "$" & decimal(i);
+	label.lft(ss, (-tip*2, tt));
+endfor
+
+draw (tip+tip,ylen*(5/6))..(xlen+extra, ylen*(5/6)) 
+	dashed evenly scaled 2;
+draw (tip+tip,ylen*(6/6))..(xlen+extra, ylen*(6/6)) 
+	dashed evenly scaled 2;
+
+% draw dots
+string s;
+numeric n, i;
+pair p[];
+i := 0;
+forever: 
+	s := readfrom "tufte-1.dat";
+	exitif s = EOF;
+	n := scantokens (s);
+	i := i + 1;
+	p[i] := (xlen*(i/11), ylen*(n/6));
+	drawdot p[i] withpen pencircle scaled 6;
+endfor
+
+% draw trends
+numeric size;
+size := i;
+for i=2 step 1 until size:
+	draw p[i-1]--p[i];
+endfor 
+
+% draw captions
+label.lft("5%", (xlen*(1977.2-1966)/11, ylen*(5.5/6)));
+label.lft(btex \begin{tabular}{r}\textbf{\Large Per capita} \\
+			\textbf{\Large budget expandures} \\
+			\textbf{\Large in constant dollars} \end{tabular} etex, 
+			(xlen*(1977-1966)/11, ylen*(1.5/6)));
+
+endfig;
+
+end;
+
+   </pre>
 
     <section>
         <h2>NUMALink</h2>
