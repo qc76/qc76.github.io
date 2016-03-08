@@ -16,7 +16,7 @@
 <body>
   <article>
     <h1>Notebook</h1>
-    <p class="subtitle">Qiong Cai (last updated on March 7, 2016)</p>
+    <p class="subtitle">Qiong Cai (last updated on March 8, 2016)</p>
 
     <p> I will put an entry in this book every time I learn something. The entries are organized in alphabetical order.</p>
 
@@ -473,7 +473,73 @@ label.bot(btex \textbf{\large Car weight (lb/1000)} etex, ((6-xshift)/6*xlen/2,-
 endfig;
 
 end;
+	</pre>
 
+  	<p><label for="dot-dash" class="margin-toggle"></label><input type="checkbox" id="dot-dash" class="margin-toggle"/><span class="marginnote">
+	  <img src="img/tufte-dot-dash.1.svg" alt="Dot Dash Plot in Tufte Style"/><br>Dot-dash plot in Tufte style.</span>
+      <span class="code">MetaPost</span> can generate figures in Tufte style.
+   </p>
+   <pre class="code">
+scrolling :=1;
+prologues :=3;
+outputformat := "svg";
+% default font is 14pt Palatino
+defaultfont := "pplr8r";
+defaultscale := 14pt/fontsize defaultfont;
+input format;
+
+verbatimtex
+%&latex
+\documentclass{article}
+\usepackage[sc]{mathpazo} 
+\usepackage[scaled]{helvet}
+\usepackage{eulervm}
+\begin{document}
+etex
+
+beginfig(1);
+numeric xlen, ylen, tip, sep,yshift, xshift;
+xlen=20cm;
+ylen=10cm;
+tip=5pt;
+sep=0.5cm;
+xshift=1;
+yshift=5;
+
+string wt, mpg;
+numeric n_x[], n_y[], s;
+
+s := 0;
+
+forever: 
+	wt := readfrom "mtcars-wt.dat";
+	mpg := readfrom "mtcars-mpg.dat";
+	exitif wt = EOF;
+	n_x[s] := scantokens (wt);
+	n_y[s] := scantokens (mpg);
+	drawdot ((n_x[s]-xshift)/6*xlen, (n_y[s]-yshift)/35*ylen) 
+			withpen pencircle scaled 6;
+
+	draw ((n_x[s]-xshift)/6*xlen, -tip)--((n_x[s]-xshift)/6*xlen,tip) withpen pencircle scaled 1;
+	draw (-tip, (n_y[s]-yshift)/35*ylen)--(tip, (n_y[s]-yshift)/35*ylen) withpen pencircle scaled 1;
+
+	s := s + 1;
+endfor
+
+for i=2 step 1 until 5:
+	label.bot(decimal(i), ((i-xshift)/6*xlen, -3*tip));
+endfor
+
+for i=10 step 5 until 35:
+	label.lft(decimal(i), (-3*tip, (i-yshift)/35*ylen));
+endfor
+
+label.top(btex \begin{tabular}{c}\textbf{\Large Miles per Gallon of Fuel} \end{tabular} etex, (0, (35-yshift)/35*ylen+1*sep));
+label.bot(btex \textbf{\Large Car weight (lb/1000)} etex, ((6-xshift)/6*xlen/2,-2.5*sep));
+
+endfig;
+
+end;
 	</pre>
 
     <section>
