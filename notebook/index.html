@@ -542,6 +542,53 @@ endfig;
 end;
 	</pre>
 
+   <p><label for="sparkline" class="margin-toggle"></label><input type="checkbox" id="sparkline" class="margin-toggle"/><span class="marginnote">
+	  <img src="img/tufte-sparkline.1.svg" alt="Sparkline in Tufte Style"/><br>Sparkline.</span>
+      <span class="code">MetaPost</span> can generate figures in Tufte style.
+   </p>
+   <pre class="code">
+% sparkline for total
+
+yshift := 19cm;
+s := 0;
+forever: 
+	total := readfrom "crime-total.dat";
+	exitif total = EOF;
+	total := total Sdiv 10;
+	n_total[s] := Scvnum(total);
+	s := s + 1;
+endfor
+
+pair min_p, max_p, pp;
+min_p := mymin(n_total)(0,s-1);
+max_p := mymax(n_total)(0,s-1);
+scale := ypart max_p - ypart min_p;
+
+
+pair p, c;
+p := ((0/s)*xlen, (n_total[0]-(ypart min_p))/scale*ylen+yshift);
+for i=1 step 1 until (s-1):
+	c := ((i)/s*xlen, (n_total[i]-(ypart min_p))/scale*ylen+yshift);
+	draw p--c;
+	p := c;
+endfor
+
+pp := ((xpart min_p)/s*xlen, (0)/scale*ylen+yshift) ;
+drawdot pp withcolor red withpen pencircle scaled 4;
+label.top (format("%0f", (ypart min_p)), pp+(0,tip));
+
+pp := ((xpart max_p)/s*xlen, (ypart max_p - ypart min_p)/scale*ylen+yshift) ;
+drawdot pp withcolor blue withpen pencircle scaled 4;
+label.top (format("%0f", (ypart max_p)), pp+(0,tip));
+
+pp := ((s-1)/s*xlen, (n_total[s-1]-ypart min_p)/scale*ylen+yshift) ;
+label.rt (format("%0f", n_total[s-1]), pp);
+label.rt (btex \large Total etex, pp + (2*sep, 0));
+
+
+
+   </pre>
+
     <section>
         <h2>NUMALink</h2>
     </section>
