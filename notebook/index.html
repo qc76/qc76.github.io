@@ -16,7 +16,7 @@
 <body>
   <article>
     <h1>Notebook</h1>
-    <p class="subtitle">Qiong Cai (last updated on March 6, 2016)</p>
+    <p class="subtitle">Qiong Cai (last updated on March 7, 2016)</p>
 
     <p> I will put an entry in this book every time I learn something. The entries are organized in alphabetical order.</p>
 
@@ -334,6 +334,147 @@ endfig;
 end;
 
    </pre>
+
+  <p><label for="range-frame" class="margin-toggle"></label><input type="checkbox" id="range-frame" class="margin-toggle"/><span class="marginnote">
+	  <img src="img/tufte-range-frame.1.svg" alt="Range frame in Tufte Style"/><br>Range frame plot in Tufte style.</span>
+      <span class="code">MetaPost</span> can generate figures in Tufte style.
+   </p>
+   <pre class="code">
+scrolling :=1;
+prologues :=3;
+outputformat := "svg";
+% default font is 14pt Palatino
+defaultfont := "pplr8r";
+defaultscale := 14pt/fontsize defaultfont;
+input format;
+
+verbatimtex
+%&latex
+\documentclass{article}
+\usepackage[sc]{mathpazo} 
+\usepackage[scaled]{helvet}
+\usepackage{eulervm}
+\begin{document}
+etex
+
+input mp-utils;
+
+beginfig(1);
+numeric xlen, ylen, tip, sep,yshift, xshift;
+xlen=20cm;
+ylen=10cm;
+tip=3pt;
+sep=0.5cm;
+xshift=1;
+yshift=5;
+
+string wt, mpg;
+numeric n_x[], n_y[], s;
+numeric x_min, x_max, y_min, y_max;
+numeric x_median, y_median;
+numeric x_q_one, x_q_three;
+numeric y_q_one, y_q_three;
+
+s := 0;
+x_min := 6;
+x_max := 0;
+y_min := 40;
+y_max := 0;
+
+% read data points and map into (x,y) coordindates
+forever: 
+	wt := readfrom "mtcars-wt.dat";
+	mpg := readfrom "mtcars-mpg.dat";
+	exitif wt = EOF;
+	n_x[s] := scantokens (wt);
+	n_y[s] := scantokens (mpg);
+	drawdot ((n_x[s]-xshift)/6*xlen, (n_y[s]-yshift)/35*ylen) 
+			withpen pencircle scaled 6;
+
+	if ( n_x[s] < x_min ):
+		x_min := n_x[s];
+	fi
+	
+	if ( n_x[s] > x_max ):
+		x_max := n_x[s];
+	fi
+	
+	if ( n_y[s] < y_min ):
+		y_min := n_y[s];
+	fi
+	
+	if ( n_y[s] > y_max ):
+		y_max := n_y[s];
+	fi
+
+	s := s + 1;
+endfor
+
+sort(n_x)(0,s-1);
+sort(n_y)(0,s-1);
+
+
+x_median = median(n_x)(0,s-1);
+y_median = median(n_y)(0,s-1);
+if odd s:
+	ii := floor(s/2);
+	x_q_one := median(n_x)(0,ii);
+	x_q_three := median(n_x)(ii,s-1);
+	y_q_one := median(n_y)(0,ii);
+	y_q_three := median(n_y)(ii,s-1);
+else:
+	ii := s/2;
+	x_q_one := median(n_x)(0, ii-1);
+	x_q_three := median(n_x)(ii, s-1);
+	y_q_one := median(n_y)(0,ii-1);
+	y_q_three := median(n_y)(ii, s-1);
+fi;
+
+
+draw (((x_min-xshift)/6)*xlen, 0)--(((x_max-xshift)/6)*xlen,0);
+draw (0, ((y_min-yshift)/35)*ylen)--(0, ((y_max-yshift)/35)*ylen);
+
+draw ((x_min-xshift)/6*xlen, -tip)--((x_min-xshift)/6*xlen,0) 
+						withcolor red withpen pencircle scaled 2;
+label.bot (decimal(roundd(x_min,1)), ((x_min-xshift)/6*xlen, -2*tip));
+draw ((x_max-xshift)/6*xlen, -tip)--((x_max-xshift)/6*xlen,0) 
+						withcolor red withpen pencircle scaled 2;
+label.bot (decimal(roundd(x_max,1)), ((x_max-xshift)/6*xlen, -2*tip));
+draw ((x_median-xshift)/6*xlen, -tip)--((x_median-xshift)/6*xlen,0) 
+						withcolor blue withpen pencircle scaled 2;
+label.bot (decimal(roundd(x_median,1)), ((x_median-xshift)/6*xlen, -2*tip));
+draw ((x_q_one-xshift)/6*xlen, -tip)--((x_q_one-xshift)/6*xlen,0) 
+						withcolor red withpen pencircle scaled 2;
+label.bot (decimal(roundd(x_q_one,1)), ((x_q_one-xshift)/6*xlen, -2*tip));
+draw ((x_q_three-xshift)/6*xlen, -tip)--((x_q_three-xshift)/6*xlen,0) 
+						withcolor red withpen pencircle scaled 2;
+label.bot (decimal(roundd(x_q_three,1)), ((x_q_three-xshift)/6*xlen, -2*tip));
+
+draw (0, (y_min-yshift)/35*ylen)--(-tip, (y_min-yshift)/35*ylen) 
+						withcolor red withpen pencircle scaled 2;
+label.lft (decimal(roundd(y_min,1)), (-2*tip, (y_min-yshift)/35*ylen));
+draw (0, (y_max-yshift)/35*ylen)--(-tip, (y_max-yshift)/35*ylen) 
+						withcolor red withpen pencircle scaled 2;
+label.lft (decimal(roundd(y_max,1)), (-2*tip, (y_max-yshift)/35*ylen));
+draw (0, (y_median-yshift)/35*ylen)--(-tip, (y_median-yshift)/35*ylen) 
+						withcolor blue withpen pencircle scaled 2;
+label.lft (decimal(roundd(y_median,1)), (-2*tip, (y_median-yshift)/35*ylen));
+draw (0, (y_q_one-yshift)/35*ylen)--(-tip, (y_q_one-yshift)/35*ylen) 
+						withcolor red withpen pencircle scaled 2;
+label.lft (decimal(roundd(y_q_one,1)), (-2*tip, (y_q_one-yshift)/35*ylen));
+draw (0, (y_q_three-yshift)/35*ylen)--(-tip, (y_q_three-yshift)/35*ylen) 
+						withcolor red withpen pencircle scaled 2;
+label.lft (decimal(roundd(y_q_three,1)), (-2*tip, (y_q_three-yshift)/35*ylen));
+
+label.top(btex \begin{tabular}{c}\textbf{\large Miles per Gallon of Fuel} 
+						\end{tabular} etex, (0, (35-yshift)/35*ylen));
+label.bot(btex \textbf{\large Car weight (lb/1000)} etex, ((6-xshift)/6*xlen/2,-2*sep));
+
+endfig;
+
+end;
+
+	</pre>
 
     <section>
         <h2>NUMALink</h2>
